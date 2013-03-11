@@ -10,8 +10,13 @@ public class Hello {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-	String s="</swaggerui/apiresources/customers/";
-	String requestURI = s.substring(s.indexOf("/apiresources")+14);
+	String requestURI="/swaggerui/apiresources/customers/";
+	requestURI = requestURI.substring(requestURI.indexOf("/apiresources")+14);
+	
+	
+	if(requestURI.indexOf('/') >0)
+		requestURI= requestURI.substring(0,requestURI.indexOf('/')+1);
+	
 	System.out.println(requestURI);
 	}
 

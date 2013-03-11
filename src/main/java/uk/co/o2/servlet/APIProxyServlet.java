@@ -3,10 +3,8 @@ package uk.co.o2.servlet;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -71,7 +69,6 @@ public class APIProxyServlet extends HttpServlet {
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		super.init(servletConfig);
-			System.out.println("init called");
 		try {
 			loadTargetURI(servletConfig);
 		} catch (Exception e) {
@@ -141,8 +138,6 @@ public class APIProxyServlet extends HttpServlet {
 	protected void service(HttpServletRequest servletRequest,
 			HttpServletResponse servletResponse) throws ServletException,
 			IOException {
-		System.out.println("JK API Here............. >><<"+ servletRequest.getRequestURL());
-		System.out.println(">><<"+ servletRequest.getRequestURI());
 		// Make the Request
 		// note: we won't transfer the protocol version because I'm not sure it
 		// would truly be compatible
@@ -343,11 +338,18 @@ public class APIProxyServlet extends HttpServlet {
 
 	private String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
 		StringBuilder uri = new StringBuilder(500);
-		
 		String requestURI = servletRequest.getRequestURI();
+		
 		requestURI = requestURI.substring(requestURI.indexOf("/apiresources")+14);
 		
+		
+		if(requestURI.indexOf('/') >0)
+			requestURI= requestURI.substring(0,requestURI.indexOf('/')+1);
+		
+		
 		uri.append(targetURIMap.get(requestURI));
+		
+		
 		try {
 			targetUri = new URI(targetURIMap.get(requestURI));
 		} catch (URISyntaxException e) {
@@ -374,7 +376,6 @@ public class APIProxyServlet extends HttpServlet {
 				uri.append(encodeUriQuery(queryString.substring(fragIdx + 1)));
 			}
 		}
-		System.out.println(uri.toString());
 		return uri.toString();
 	}
 
