@@ -1,0 +1,39 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Swagger UI</display-name>
+	<servlet>
+		<servlet-name>ResourcesProxyServlet</servlet-name>
+		<servlet-class>uk.co.o2.servlet.ResourcesProxyServlet</servlet-class>
+		<init-param>
+			<param-name>targetUri</param-name>
+			<param-value>http://localhost:6080/Customer/resources</param-value>
+		</init-param>
+		<init-param>
+			<param-name>log</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>APIProxyServlet</servlet-name>
+		<servlet-class>uk.co.o2.servlet.APIProxyServlet</servlet-class>
+		<init-param>
+			<param-name>targetUri</param-name>
+			<param-value>http://localhost:6080/Customer</param-value>
+		</init-param>
+		<init-param>
+		    <param-name>customers/</param-name>
+		    <param-value>http://localhost:6080/Customer</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>APIProxyServlet</servlet-name>
+		<url-pattern>/apiresources/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ResourcesProxyServlet</servlet-name>
+		<url-pattern>*.res</url-pattern>
+	</servlet-mapping>
+</web-app>
