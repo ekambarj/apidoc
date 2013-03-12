@@ -59,8 +59,8 @@
 		<!-- JS variable to be modified accordingly based on the environment-->
 		<!-- domainResourcesEndPoint : A JS Array containing list of domain API  resources path-->
 		<!-- basePath_APIGWPathMap : A JS map containing mapping resources lists, the key contains the API resources basepath and the value will be the API gateway resource path. During run time the API gateway resource path will be identified based on the resource base path.-->
-		var domainResourcesEndPoint =["http://localhost:8080/swaggerui/Customer.res"]
-	    var basePath_APIGWPathMap = {'http://localhost:8080/swaggerui/Customer.res':'<%=clientBasePathURL%>/Customer.api'};
+		var domainResourcesEndPoint =['<%=clientBasePathURL%>/Customer.res']
+	    var basePath_APIGWPathMap = {'<%=clientBasePathURL%>/Customer.res':'<%=clientBasePathURL%>/Customer.api'};
 
 	</script>
 

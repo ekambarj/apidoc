@@ -214,8 +214,18 @@
         if (this.path == null) {
           this.api.fail("SwaggerResources must have a path.");
         }
+        //commented by JK
+        //this.url = this.api.suffixApiKey(this.api.basePath + this.path.replace('{format}', 'json'));
+        this.url = this.api.suffixApiKey(basePathURI +'/apiresources'+this.path.replace('{format}', 'json'));
         
-        this.url = this.api.suffixApiKey(this.api.basePath + this.path.replace('{format}', 'json'));
+        //added by JK to identify end point uri
+        if(null != this.url)
+        {
+        	//appending resource name as query param, to identiy end point uri
+        	this.url = this.url.indexOf('?') > 0 ? this.url+'&' : this.url+'?'; 
+        	this.url=this.url+'resourceName='+this.name;
+        }
+        
         this.api.progress('fetching resource ' + this.name + ': ' + this.url);
         jQuery.getJSON(this.url, function(response) {
           var endpoint, _i, _len, _ref;
@@ -616,6 +626,13 @@
         url += "?" + queryParams;
       }
       
+        //added by JK to identify end point uri
+        if(null != url)
+        {
+        	//appending resource name as query param, to identiy end point uri
+        	url = url.indexOf('?') > 0 ? url+'&' : url+'?'; 
+        	url=url+'resourceName='+this.resourceName;
+        }
       return url;
     };
 

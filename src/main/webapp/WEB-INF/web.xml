@@ -24,7 +24,7 @@
 			<param-value>http://localhost:6080/Customer</param-value>
 		</init-param>
 		<init-param>
-		    <param-name>customers/</param-name>
+		    <param-name>customers</param-name>
 		    <param-value>http://localhost:6080/Customer</param-value>
 		</init-param>
 	</servlet>

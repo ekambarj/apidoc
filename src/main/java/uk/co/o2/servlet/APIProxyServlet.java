@@ -144,6 +144,7 @@ public class APIProxyServlet extends HttpServlet {
 		String method = servletRequest.getMethod();
 		String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
 		HttpRequest proxyRequest;
+		System.out.println("Inside API Proxy servlet");
 		// spec: RFC 2616, sec 4.3: either these two headers signal that there
 		// is a message body.
 		if (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null
@@ -338,20 +339,33 @@ public class APIProxyServlet extends HttpServlet {
 
 	private String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
 		StringBuilder uri = new StringBuilder(500);
-		String requestURI = servletRequest.getRequestURI();
 		
-		requestURI = requestURI.substring(requestURI.indexOf("/apiresources")+14);
+		String queryStr=servletRequest.getQueryString();
+		String requestedURI=null;
+		if(null != queryStr)
+		{
+			String[] queryStrParams=queryStr.split("&");
+			
+			for(String arg:queryStrParams)
+			{
+				if(arg.contains("resourceName"))
+				{
+					String[] argValue=arg.split("=");
+					requestedURI=argValue[1];
+					break;
+				}
+			}
+		}
 		
 		
-		if(requestURI.indexOf('/') >0)
-			requestURI= requestURI.substring(0,requestURI.indexOf('/')+1);
+		System.out.println("Requested resource"+requestedURI);
+		System.out.println("Requested URI"+targetURIMap.get(requestedURI));
 		
 		
-		uri.append(targetURIMap.get(requestURI));
-		
+		uri.append(targetURIMap.get(requestedURI));
 		
 		try {
-			targetUri = new URI(targetURIMap.get(requestURI));
+			targetUri = new URI(targetURIMap.get(requestedURI));
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
