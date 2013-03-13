@@ -8,24 +8,24 @@
 		<servlet-name>ResourcesProxyServlet</servlet-name>
 		<servlet-class>uk.co.o2.servlet.ResourcesProxyServlet</servlet-class>
 		<init-param>
-			<param-name>targetUri</param-name>
-			<param-value>http://localhost:6080/Customer/resources</param-value>
+		    <param-name>customers</param-name>
+		    <param-value>http://localhost:6080/Customer/resources</param-value>
 		</init-param>
 		<init-param>
-			<param-name>log</param-name>
-			<param-value>true</param-value>
+		    <param-name>tariffs</param-name>
+		    <param-value>http://localhost:7080/Tariff/resources</param-value>
 		</init-param>
 	</servlet>
 	<servlet>
 		<servlet-name>APIProxyServlet</servlet-name>
 		<servlet-class>uk.co.o2.servlet.APIProxyServlet</servlet-class>
 		<init-param>
-			<param-name>targetUri</param-name>
-			<param-value>http://localhost:6080/Customer</param-value>
-		</init-param>
-		<init-param>
 		    <param-name>customers</param-name>
 		    <param-value>http://localhost:6080/Customer</param-value>
+		</init-param>
+		<init-param>
+		    <param-name>tariffs</param-name>
+		    <param-value>http://localhost:7080/Tariff</param-value>
 		</init-param>
 	</servlet>
 	<servlet-mapping>

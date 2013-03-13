@@ -56,7 +56,6 @@ public class APIProxyServlet extends HttpServlet {
 
 	private static Map<String, String> targetURIMap = new HashMap<String, String>();
 	protected boolean doLog = true;
-	protected URI targetUri;
 	protected HttpClient proxyClient;
 
 	@Override
@@ -141,9 +140,11 @@ public class APIProxyServlet extends HttpServlet {
 		// Make the Request
 		// note: we won't transfer the protocol version because I'm not sure it
 		// would truly be compatible
+		URI targetUri=getTargetURI(servletRequest);
 		String method = servletRequest.getMethod();
-		String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
+		String proxyRequestUri = rewriteUrlFromRequest(servletRequest,targetUri);
 		HttpRequest proxyRequest;
+		
 		System.out.println("Inside API Proxy servlet");
 		// spec: RFC 2616, sec 4.3: either these two headers signal that there
 		// is a message body.
@@ -160,7 +161,7 @@ public class APIProxyServlet extends HttpServlet {
 		} else
 			proxyRequest = new BasicHttpRequest(method, proxyRequestUri);
 
-		copyRequestHeaders(servletRequest, proxyRequest);
+		copyRequestHeaders(servletRequest, proxyRequest,targetUri);
 
 		try {
 			// Execute the request
@@ -176,7 +177,7 @@ public class APIProxyServlet extends HttpServlet {
 			int statusCode = proxyResponse.getStatusLine().getStatusCode();
 
 			if (doResponseRedirectOrNotModifiedLogic(servletRequest,
-					servletResponse, proxyResponse, statusCode)) {
+					servletResponse, proxyResponse, statusCode,targetUri)) {
 				// just to be sure, but is probably a no-op
 				EntityUtils.consume(proxyResponse.getEntity());
 				return;
@@ -213,7 +214,7 @@ public class APIProxyServlet extends HttpServlet {
 	private boolean doResponseRedirectOrNotModifiedLogic(
 			HttpServletRequest servletRequest,
 			HttpServletResponse servletResponse, HttpResponse proxyResponse,
-			int statusCode) throws ServletException, IOException {
+			int statusCode,URI targetURI) throws ServletException, IOException {
 		// Check if the proxy response is a redirect
 		// The following code is adapted from
 		// org.tigris.noodle.filters.CheckForRedirect
@@ -229,7 +230,7 @@ public class APIProxyServlet extends HttpServlet {
 			// Modify the redirect to go to this proxy servlet rather that the
 			// proxied host
 			String locStr = rewriteUrlFromResponse(servletRequest,
-					locationHeader.getValue());
+					locationHeader.getValue(),targetURI);
 
 			servletResponse.sendRedirect(locStr);
 			return true;
@@ -275,7 +276,7 @@ public class APIProxyServlet extends HttpServlet {
 
 	/** Copy request headers from the servlet client to the proxy request. */
 	protected void copyRequestHeaders(HttpServletRequest servletRequest,
-			HttpRequest proxyRequest) {
+			HttpRequest proxyRequest,URI targetUri) {
 		// Get an Enumeration of all of the header names sent by the client
 		Enumeration enumerationOfHeaderNames = servletRequest.getHeaderNames();
 		while (enumerationOfHeaderNames.hasMoreElements()) {
@@ -299,7 +300,7 @@ public class APIProxyServlet extends HttpServlet {
 				// rewrite the Host header to ensure that we get content from
 				// the correct virtual server
 				if (headerName.equalsIgnoreCase(HttpHeaders.HOST)) {
-					HttpHost host = URIUtils.extractHost(this.targetUri);
+					HttpHost host = URIUtils.extractHost(targetUri);
 					headerValue = host.getHostName();
 					if (host.getPort() != -1)
 						headerValue += ":" + host.getPort();
@@ -336,10 +337,10 @@ public class APIProxyServlet extends HttpServlet {
 			}
 		}
 	}
-
-	private String rewriteUrlFromRequest(HttpServletRequest servletRequest) {
-		StringBuilder uri = new StringBuilder(500);
-		
+	
+	private URI getTargetURI(HttpServletRequest servletRequest)
+	{
+		URI targetUri=null;
 		String queryStr=servletRequest.getQueryString();
 		String requestedURI=null;
 		if(null != queryStr)
@@ -361,9 +362,6 @@ public class APIProxyServlet extends HttpServlet {
 		System.out.println("Requested resource"+requestedURI);
 		System.out.println("Requested URI"+targetURIMap.get(requestedURI));
 		
-		
-		uri.append(targetURIMap.get(requestedURI));
-		
 		try {
 			targetUri = new URI(targetURIMap.get(requestedURI));
 		} catch (URISyntaxException e) {
@@ -371,6 +369,12 @@ public class APIProxyServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		
+		return targetUri;
+	}
+
+	private String rewriteUrlFromRequest(HttpServletRequest servletRequest,URI targetUri) {
+		StringBuilder uri = new StringBuilder(500);
+		uri.append(targetUri.toString());
 		// Handle the path given to the servlet
 		if (servletRequest.getPathInfo() != null) {// ex: /my/path.html
 			uri.append(servletRequest.getPathInfo());
@@ -394,9 +398,9 @@ public class APIProxyServlet extends HttpServlet {
 	}
 
 	private String rewriteUrlFromResponse(HttpServletRequest servletRequest,
-			String theUrl) {
+			String theUrl,URI targetURI) {
 		// TODO document example paths
-		if (theUrl.startsWith(this.targetUri.toString())) {
+		if (theUrl.startsWith(targetURI.toString())) {
 			String curUrl = servletRequest.getRequestURL().toString();// no
 																		// query
 			String pathInfo = servletRequest.getPathInfo();
@@ -407,7 +411,7 @@ public class APIProxyServlet extends HttpServlet {
 																// off
 			}
 			theUrl = curUrl
-					+ theUrl.substring(this.targetUri.toString().length());
+					+ theUrl.substring(targetURI.toString().length());
 		}
 		return theUrl;
 	}
