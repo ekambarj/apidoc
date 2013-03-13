@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -155,6 +156,7 @@ public class ResourcesProxyServlet extends HttpServlet {
 		HttpRequest proxyRequest;
 		// spec: RFC 2616, sec 4.3: either these two headers signal that there
 		// is a message body.
+		
 		if (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null
 				|| servletRequest.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) {
 			HttpEntityEnclosingRequest eProxyRequest = new BasicHttpEntityEnclosingRequest(
@@ -169,7 +171,8 @@ public class ResourcesProxyServlet extends HttpServlet {
 			proxyRequest = new BasicHttpRequest(method, proxyRequestUri);
 
 		copyRequestHeaders(servletRequest, proxyRequest,uri);
-
+		
+		
 		try {
 			// Execute the request
 			if (doLog) {
@@ -177,6 +180,13 @@ public class ResourcesProxyServlet extends HttpServlet {
 						+ servletRequest.getRequestURI() + " -- "
 						+ proxyRequest.getRequestLine().getUri());
 			}
+			
+			byte[] byteArray = "thbs:thbs123!".getBytes();
+			String encoding = Base64.encodeBase64String(byteArray);
+			
+			//setHeader("Authorization", "Basic " + encoding);
+			
+			proxyRequest.addHeader("Authorization", "Basic " + encoding);
 			HttpResponse proxyResponse = proxyClient.execute(
 					URIUtils.extractHost(uri), proxyRequest);
 
