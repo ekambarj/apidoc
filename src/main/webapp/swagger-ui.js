@@ -255,12 +255,13 @@ function program1(depth0,data) {
   buffer += escapeExpression(stack1) + "\n        ";
   return buffer;}
 
-  buffer += "\n<div class='container' id='resources_container'>\n    <ul id='resources'>\n    </ul>\n\n    <div class=\"footer\">\n        <br>\n        <br>\n        <h4 style=\"color: #999\">[ <span style=\"font-variant: small-caps\">base url</span>: ";
+  //buffer += "\n<div class='container' id='resources_container'>\n    <ul id='resources'>\n    </ul>\n\n    <div style=\"visibility: hidden\" class=\"footer\">\n        <br>\n        <br>\n        <h4 style=\"color: #999\">[ <span style=\"font-variant: small-caps\">base url</span>: ";
+  buffer += "\n<div class='container' id='resources_container'>\n    <ul id='resources'>\n    </ul>\n\n    ";
   foundHelper = helpers.basePath;
   stack1 = foundHelper || depth0.basePath;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "basePath", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "\n        ";
+  //buffer += escapeExpression(stack1) + "\n        ";
   foundHelper = helpers.apiVersion;
   stack1 = foundHelper || depth0.apiVersion;
   stack2 = helpers['if'];
@@ -269,8 +270,8 @@ function program1(depth0,data) {
   tmp1.fn = tmp1;
   tmp1.inverse = self.noop;
   stack1 = stack2.call(depth0, stack1, tmp1);
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "]</h4>\n    </div>\n</div>\n";
+  //if(stack1 || stack1 === 0) { buffer += stack1; }
+  //buffer += "]</h4>\n    </div>\n</div>\n";
   return buffer;});
 })();
 
